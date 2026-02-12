@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 4%;
+    --foreground: 180 10% 85%;
+
+    --muted: 220 15% 10%;
+    --muted-foreground: 220 10% 50%;
+
+    --accent: 180 100% 50%;
+    --accent-foreground: 220 20% 4%;
+
+    --border: 180 20% 15%;
+
+    --card: 220 20% 7%;
+    --card-foreground: 180 10% 85%;
+
+    --neon-cyan: 180 100% 50%;
+    --neon-green: 142 76% 50%;
+    --neon-amber: 38 92% 55%;
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-mono;
+  }
+
+  ::selection {
+    background: hsl(180 100% 50% / 0.2);
+    color: hsl(180 100% 70%);
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(220 20% 4%);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(180 20% 20%);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(180 100% 50% / 0.4);
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: hsl(220 20% 7% / 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(180 100% 50% / 0.1);
+  }
+
+  .glass-strong {
+    background: hsl(220 20% 7% / 0.8);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid hsl(180 100% 50% / 0.15);
+  }
+
+  .neon-glow {
+    box-shadow:
+      0 0 10px hsl(180 100% 50% / 0.15),
+      0 0 30px hsl(180 100% 50% / 0.08),
+      inset 0 0 10px hsl(180 100% 50% / 0.03);
+  }
+
+  .neon-text {
+    text-shadow:
+      0 0 8px hsl(180 100% 50% / 0.5),
+      0 0 20px hsl(180 100% 50% / 0.2);
+  }
+
+  .scanline {
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      hsl(180 100% 50% / 0.02) 2px,
+      hsl(180 100% 50% / 0.02) 4px
+    );
+    pointer-events: none;
+  }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(hsl(180 100% 50% / 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(180 100% 50% / 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
