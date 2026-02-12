@@ -13,8 +13,6 @@ export default function Home() {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
   const [showProjectWindow, setShowProjectWindow] = useState(false)
 
-  console.log("[v0] Home rendered, activeSection:", activeSection)
-
   const handleSelectProject = useCallback((projectId: string) => {
     setSelectedProjectId(projectId)
     setShowProjectWindow(true)

@@ -3,25 +3,13 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 220 20% 4%;
-    --foreground: 180 10% 85%;
-    --muted: 220 15% 10%;
-    --muted-foreground: 220 10% 50%;
-    --accent: 180 100% 50%;
-    --accent-foreground: 220 20% 4%;
-    --border: 180 20% 15%;
-    --card: 220 20% 7%;
-    --card-foreground: 180 10% 85%;
-    --neon-cyan: 180 100% 50%;
-    --neon-green: 142 76% 50%;
-    --neon-amber: 38 92% 55%;
-    --radius: 0.75rem;
+  * {
+    border-color: hsl(180 20% 15%);
   }
 
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    background-color: hsl(220 20% 4%);
+    color: hsl(180 10% 85%);
   }
 
   ::selection {
