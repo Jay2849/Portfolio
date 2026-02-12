@@ -4,6 +4,14 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { projects, experience, skills } from "@/lib/data"
 
+const CYAN = "hsl(180 100% 50%)"
+const GREEN = "hsl(142 76% 50%)"
+const AMBER = "hsl(38 92% 55%)"
+const MUTED = "hsl(220 10% 50%)"
+const FG = "hsl(180 10% 85%)"
+const CARD_BG = "hsl(220 20% 7% / 0.8)"
+const BORDER = "hsl(180 20% 15%)"
+
 interface TerminalLine {
   id: number
   type: "input" | "output" | "error" | "system" | "ascii"
@@ -43,9 +51,6 @@ I build resilient, high-throughput systems that scale.
 Passionate about distributed computing, system design,
 and infrastructure automation.
 
-When I'm not writing code, I'm reading about database
-internals or contributing to open-source projects.
-
 Location   : Earth
 Focus      : Distributed Systems & Backend Architecture
 Status     : Open to collaboration
@@ -72,8 +77,19 @@ const NEOFETCH = `
   Packages : 127 (npm)
   Theme    : Neon Cyberpunk
   Icons    : Lucide
-  Font     : Geist Mono
+  Font     : JetBrains Mono
 `
+
+function getLineColor(line: TerminalLine): string {
+  if (line.type === "error") return "#f87171"
+  if (line.type === "ascii") return CYAN
+  if (line.type === "system") return line.color === "cyan" ? CYAN : MUTED
+  if (line.color === "cyan") return CYAN
+  if (line.color === "green") return GREEN
+  if (line.color === "amber") return AMBER
+  if (line.color === "muted") return MUTED
+  return FG
+}
 
 export function Terminal({ onSelectProject, onSectionChange }: TerminalProps) {
   const [lines, setLines] = useState<TerminalLine[]>([])
@@ -85,15 +101,10 @@ export function Terminal({ onSelectProject, onSectionChange }: TerminalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const addLines = useCallback(
-    (
-      newLines: { type: TerminalLine["type"]; content: string; color?: string }[]
-    ) => {
+    (newLines: { type: TerminalLine["type"]; content: string; color?: string }[]) => {
       setLineCounter((prev) => {
         let counter = prev
-        const mapped = newLines.map((l) => ({
-          ...l,
-          id: counter++,
-        }))
+        const mapped = newLines.map((l) => ({ ...l, id: counter++ }))
         setLines((old) => [...old, ...mapped])
         return counter
       })
@@ -103,18 +114,10 @@ export function Terminal({ onSelectProject, onSectionChange }: TerminalProps) {
 
   useEffect(() => {
     addLines([
-      { type: "ascii", content: ASCII_BANNER, color: "text-neon-cyan" },
+      { type: "ascii", content: ASCII_BANNER, color: "cyan" },
       { type: "system", content: "" },
-      {
-        type: "system",
-        content: "Welcome to PortfolioOS v2.0",
-        color: "text-neon-cyan",
-      },
-      {
-        type: "system",
-        content: 'Type "help" to see available commands.',
-        color: "text-muted-foreground",
-      },
+      { type: "system", content: "Welcome to PortfolioOS v2.0", color: "cyan" },
+      { type: "system", content: 'Type "help" to see available commands.', color: "muted" },
       { type: "system", content: "" },
     ])
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -133,100 +136,53 @@ export function Terminal({ onSelectProject, onSectionChange }: TerminalProps) {
       const command = parts[0]
       const arg = parts[1]
 
-      addLines([{ type: "input", content: `~$ ${cmd}` }])
+      addLines([{ type: "input", content: cmd }])
 
       switch (command) {
-        case "": {
+        case "":
           break
-        }
 
-        case "help": {
-          addLines(
-            HELP_TEXT.split("\n").map((l) => ({
-              type: "output" as const,
-              content: l,
-            }))
-          )
+        case "help":
+          addLines(HELP_TEXT.split("\n").map((l) => ({ type: "output" as const, content: l })))
           break
-        }
 
-        case "about": {
+        case "about":
           onSectionChange("about")
           addLines(
             ABOUT_TEXT.split("\n").map((l) => ({
               type: "output" as const,
               content: l,
-              color: l.startsWith(">") ? "text-neon-cyan" : undefined,
+              color: l.startsWith(">") ? "cyan" : undefined,
             }))
           )
           break
-        }
 
-        case "projects": {
+        case "projects":
           onSectionChange("projects")
           addLines([
             { type: "output", content: "" },
-            {
-              type: "output",
-              content: "> Project Registry",
-              color: "text-neon-cyan",
-            },
+            { type: "output", content: "> Project Registry", color: "cyan" },
             { type: "output", content: "" },
           ])
           projects.forEach((p, i) => {
-            const statusColor =
-              p.status === "LIVE"
-                ? "text-neon-green"
-                : p.status === "IN_DEV"
-                  ? "text-neon-amber"
-                  : "text-muted-foreground"
             addLines([
-              {
-                type: "output",
-                content: `  [${i + 1}] ${p.name}`,
-                color: "text-neon-cyan",
-              },
-              {
-                type: "output",
-                content: `      Status: ${p.status}`,
-                color: statusColor,
-              },
-              {
-                type: "output",
-                content: `      Stack:  ${p.tech.join(", ")}`,
-              },
+              { type: "output", content: `  [${i + 1}] ${p.name}`, color: "cyan" },
+              { type: "output", content: `      Status: ${p.status}`, color: p.status === "LIVE" ? "green" : p.status === "IN_DEV" ? "amber" : "muted" },
+              { type: "output", content: `      Stack:  ${p.tech.join(", ")}` },
               { type: "output", content: "" },
             ])
           })
-          addLines([
-            {
-              type: "system",
-              content: '  Use "project <number>" for details.',
-              color: "text-muted-foreground",
-            },
-            { type: "output", content: "" },
-          ])
+          addLines([{ type: "system", content: '  Use "project <number>" for details.', color: "muted" }, { type: "output", content: "" }])
           break
-        }
 
         case "project": {
           if (!arg) {
-            addLines([
-              {
-                type: "error",
-                content: 'Usage: project <number> (e.g. "project 1")',
-              },
-            ])
+            addLines([{ type: "error", content: 'Usage: project <number> (e.g. "project 1")' }])
             break
           }
           const idx = parseInt(arg) - 1
           if (isNaN(idx) || idx < 0 || idx >= projects.length) {
-            addLines([
-              {
-                type: "error",
-                content: `Project ${arg} not found. Use "projects" to see the list.`,
-              },
-            ])
+            addLines([{ type: "error", content: `Project ${arg} not found. Use "projects" to see the list.` }])
             break
           }
           const p = projects[idx]
@@ -234,120 +190,74 @@ export function Terminal({ onSelectProject, onSectionChange }: TerminalProps) {
           onSectionChange("project-detail")
           addLines([
             { type: "output", content: "" },
-            {
-              type: "output",
-              content: `> Loading ${p.name}...`,
-              color: "text-neon-green",
-            },
-            {
-              type: "system",
-              content: "  [Window opened in GUI panel]",
-              color: "text-muted-foreground",
-            },
+            { type: "output", content: `> Loading ${p.name}...`, color: "green" },
+            { type: "system", content: "  [Window opened in GUI panel]", color: "muted" },
             { type: "output", content: "" },
           ])
           break
         }
 
-        case "experience": {
+        case "experience":
           onSectionChange("experience")
           addLines([
             { type: "output", content: "" },
-            {
-              type: "output",
-              content: "> Work Experience",
-              color: "text-neon-cyan",
-            },
+            { type: "output", content: "> Work Experience", color: "cyan" },
             { type: "output", content: "" },
           ])
           experience.forEach((e) => {
             addLines([
-              {
-                type: "output",
-                content: `  ${e.role} @ ${e.company}`,
-                color: "text-neon-cyan",
-              },
-              {
-                type: "output",
-                content: `  ${e.period}`,
-                color: "text-neon-amber",
-              },
+              { type: "output", content: `  ${e.role} @ ${e.company}`, color: "cyan" },
+              { type: "output", content: `  ${e.period}`, color: "amber" },
               { type: "output", content: `  ${e.description}` },
-              {
-                type: "output",
-                content: `  Stack: ${e.tech.join(", ")}`,
-                color: "text-muted-foreground",
-              },
+              { type: "output", content: `  Stack: ${e.tech.join(", ")}`, color: "muted" },
               { type: "output", content: "" },
             ])
           })
           break
-        }
 
-        case "skills": {
+        case "skills":
           onSectionChange("skills")
           addLines([
             { type: "output", content: "" },
-            {
-              type: "output",
-              content: "> Technical Skills",
-              color: "text-neon-cyan",
-            },
+            { type: "output", content: "> Technical Skills", color: "cyan" },
             { type: "output", content: "" },
           ])
           skills.forEach((s) => {
             addLines([
-              {
-                type: "output",
-                content: `  [${s.category}]`,
-                color: "text-neon-amber",
-              },
-              {
-                type: "output",
-                content: `   ${s.items.join("  |  ")}`,
-              },
+              { type: "output", content: `  [${s.category}]`, color: "amber" },
+              { type: "output", content: `   ${s.items.join("  |  ")}` },
               { type: "output", content: "" },
             ])
           })
           break
-        }
 
-        case "contact": {
+        case "contact":
           onSectionChange("contact")
           addLines(
             CONTACT_TEXT.split("\n").map((l) => ({
               type: "output" as const,
               content: l,
-              color: l.startsWith(">") ? "text-neon-cyan" : undefined,
+              color: l.startsWith(">") ? "cyan" : undefined,
             }))
           )
           break
-        }
 
-        case "neofetch": {
+        case "neofetch":
           addLines(
             NEOFETCH.split("\n").map((l) => ({
               type: "output" as const,
               content: l,
-              color: l.includes(":") ? undefined : "text-neon-cyan",
+              color: l.includes(":") ? undefined : "cyan",
             }))
           )
           break
-        }
 
-        case "clear": {
+        case "clear":
           setLines([])
           break
-        }
 
-        default: {
-          addLines([
-            {
-              type: "error",
-              content: `Command not found: ${command}. Type "help" for available commands.`,
-            },
-          ])
-        }
+        default:
+          addLines([{ type: "error", content: `Command not found: ${command}. Type "help" for available commands.` }])
       }
     },
     [addLines, onSelectProject, onSectionChange]
@@ -378,17 +288,7 @@ export function Terminal({ onSelectProject, onSectionChange }: TerminalProps) {
       }
     } else if (e.key === "Tab") {
       e.preventDefault()
-      const commands = [
-        "help",
-        "about",
-        "projects",
-        "project",
-        "experience",
-        "skills",
-        "contact",
-        "clear",
-        "neofetch",
-      ]
+      const commands = ["help", "about", "projects", "project", "experience", "skills", "contact", "clear", "neofetch"]
       const match = commands.find((c) => c.startsWith(input.toLowerCase()))
       if (match) setInput(match)
     }
@@ -397,15 +297,13 @@ export function Terminal({ onSelectProject, onSectionChange }: TerminalProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Terminal Header */}
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-card/80">
+      <div className="flex items-center gap-2 px-4 py-2.5" style={{ borderBottom: `1px solid ${BORDER}`, backgroundColor: CARD_BG }}>
         <div className="flex gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-red-500/70" />
-          <div className="w-3 h-3 rounded-full bg-neon-amber/70" />
-          <div className="w-3 h-3 rounded-full bg-neon-green/70" />
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(0 70% 50% / 0.7)" }} />
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(38 92% 55% / 0.7)" }} />
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(142 76% 50% / 0.7)" }} />
         </div>
-        <span className="text-xs text-muted-foreground ml-2">
-          terminal -- jay@portfolio:~
-        </span>
+        <span className="text-xs ml-2" style={{ color: MUTED }}>terminal -- jay@portfolio:~</span>
       </div>
 
       {/* Terminal Body */}
@@ -423,24 +321,15 @@ export function Terminal({ onSelectProject, onSectionChange }: TerminalProps) {
               initial={{ opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.1 }}
-              className={`whitespace-pre-wrap ${
-                line.type === "error"
-                  ? "text-red-400"
-                  : line.type === "ascii"
-                    ? line.color || "text-neon-cyan"
-                    : line.type === "system"
-                      ? line.color || "text-muted-foreground"
-                      : line.color || "text-foreground"
-              }`}
+              className="whitespace-pre-wrap"
+              style={{ color: getLineColor(line) }}
             >
               {line.type === "input" ? (
                 <span>
-                  <span className="text-neon-green">{">"}</span>{" "}
-                  <span className="text-neon-cyan">{"~"}</span>
-                  <span className="text-muted-foreground">{"$ "}</span>
-                  <span className="text-foreground">
-                    {line.content.replace("~$ ", "")}
-                  </span>
+                  <span style={{ color: GREEN }}>{">"}</span>{" "}
+                  <span style={{ color: CYAN }}>{"~"}</span>
+                  <span style={{ color: MUTED }}>{"$ "}</span>
+                  <span style={{ color: FG }}>{line.content}</span>
                 </span>
               ) : (
                 line.content
@@ -451,29 +340,26 @@ export function Terminal({ onSelectProject, onSectionChange }: TerminalProps) {
 
         {/* Input Line */}
         <div className="flex items-center gap-1 mt-1">
-          <span className="text-neon-green">{">"}</span>{" "}
-          <span className="text-neon-cyan">{"~"}</span>
-          <span className="text-muted-foreground">{"$ "}</span>
+          <span style={{ color: GREEN }}>{">"}</span>{" "}
+          <span style={{ color: CYAN }}>{"~"}</span>
+          <span style={{ color: MUTED }}>{"$ "}</span>
           <input
             ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent outline-none text-foreground text-sm font-mono"
-            style={{ caretColor: "hsl(180 100% 50%)" }}
+            className="flex-1 bg-transparent outline-none text-sm font-mono"
+            style={{ caretColor: CYAN, color: FG }}
             autoFocus
             spellCheck={false}
             aria-label="Terminal command input"
           />
           <motion.span
             animate={{ opacity: [1, 0] }}
-            transition={{
-              duration: 0.8,
-              repeat: Infinity,
-              repeatType: "reverse",
-            }}
-            className="w-2 h-4 bg-neon-cyan/80 inline-block"
+            transition={{ duration: 0.8, repeat: Infinity, repeatType: "reverse" }}
+            className="w-2 h-4 inline-block"
+            style={{ backgroundColor: "hsl(180 100% 50% / 0.8)" }}
           />
         </div>
       </div>
