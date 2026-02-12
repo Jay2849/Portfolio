@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 import { Terminal } from "@/components/terminal"
 import { GuiPanel } from "@/components/gui-panel"
 import { ProjectWindow } from "@/components/project-window"

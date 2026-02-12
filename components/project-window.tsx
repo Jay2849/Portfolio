@@ -1,6 +1,6 @@
 "use client"
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "motion/react"
 import { X, ExternalLink, GitBranch, Clock, Shield } from "lucide-react"
 import { projects, type Project } from "@/lib/data"
 

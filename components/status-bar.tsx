@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 import { Wifi, Battery, Signal, Shield } from "lucide-react"
 
 export function StatusBar() {
