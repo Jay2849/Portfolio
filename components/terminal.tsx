@@ -460,7 +460,8 @@ export function Terminal({ onSelectProject, onSectionChange }: TerminalProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent outline-none text-foreground caret-neon-cyan text-sm font-mono"
+            className="flex-1 bg-transparent outline-none text-foreground text-sm font-mono"
+            style={{ caretColor: "hsl(180 100% 50%)" }}
             autoFocus
             spellCheck={false}
             aria-label="Terminal command input"
